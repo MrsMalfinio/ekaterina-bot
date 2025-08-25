@@ -15,8 +15,9 @@ from telegram.ext import (
 )
 
 # ========= НАСТРОЙКИ =========
-BOT_TOKEN = os.getenv("BOT_TOKEN")   # теперь берётся из переменных окружения
-ADMIN_ID = int(os.getenv("ADMIN_ID"))  # тоже из окружения
+BOT_TOKEN = os.getenv("BOT_TOKEN")                # ОБЯЗАТЕЛЬНО задать на Render
+ADMIN_ID = int(os.getenv("ADMIN_ID", "6076753734"))
+CHANNEL_URL = "https://t.me/Fomenko_neiro"        # ссылка на канал Екатерины
 
 STATE_ASK_Q = "ask_question"
 STATE_ASK_DOB = "ask_dob"
@@ -50,7 +51,8 @@ ASK_DOB_PROMPT = (
 THANK_YOU_TEXT = (
     "<b>Спасибо тебе за доверие и за этот вопрос 🙏</b>\n"
     "Совсем скоро я сделаю разбор и поделюсь им в канале.\n\n"
-    "<b>Чтобы не пропустить разбор твоего вопроса, включи уведомления и будь рядом 🤍</b>"
+    "<b>Чтобы не пропустить разбор твоего вопроса, включи уведомления и будь рядом 🤍</b>\n\n"
+    f"Канал Екатерины: {CHANNEL_URL}"
 )
 
 # ========= ЛОГИКА =========
@@ -106,9 +108,7 @@ async def text_router(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # благодарность + КНОПКА
         await update.message.reply_text(
-            THANK_YOU_TEXT,
-            parse_mode=ParseMode.HTML,
-            reply_markup=ASK_AGAIN_KB
+            THANK_YOU_TEXT, parse_mode=ParseMode.HTML, reply_markup=ASK_AGAIN_KB
         )
         context.user_data.clear()
         return
@@ -117,14 +117,13 @@ async def text_router(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Давай начнём сначала. Напиши «старт».")
     return
 
+# --- для локального запуска (polling). На Render НЕ используется.
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
-
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex("(?i)"+START_TRIGGERS), trigger_start))
     app.add_handler(CallbackQueryHandler(ask_again_cb, pattern=r"^ask_again$"))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_router))
-
     app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
