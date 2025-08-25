@@ -15,10 +15,8 @@ from telegram.ext import (
 )
 
 # ========= НАСТРОЙКИ =========
-# На локалке можно оставить значения по умолчанию (твой токен/ID),
-# а на Render зададим переменные окружения BOT_TOKEN и ADMIN_ID.
-BOT_TOKEN = os.getenv("BOT_TOKEN", "8285015041:AAGz4snUjXFBGckjWtbk79VzJai2Q7NuJs0")
-ADMIN_ID = int(os.getenv("ADMIN_ID", "6076753734"))
+BOT_TOKEN = os.getenv("BOT_TOKEN")   # теперь берётся из переменных окружения
+ADMIN_ID = int(os.getenv("ADMIN_ID"))  # тоже из окружения
 
 STATE_ASK_Q = "ask_question"
 STATE_ASK_DOB = "ask_dob"
